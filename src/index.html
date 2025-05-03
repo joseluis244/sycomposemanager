@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Medicaresoft SRL</title>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #003366; /* Corporate blue */
+      position: relative; /* Required for absolute positioning of footer */
+      margin: 0; /* Resetting default margin */
+    }
+
+    .logo {
+      width: 200px;
+      height: 200px;
+      background-color: #ccc;
+      border-radius: 50%;
+    }
+
+    .footer-watermark {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #fff;
+      font-size: 14px;
+      opacity: 0.5;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="logo"></div>
+  <div class="footer-watermark">© Medicaresoft SRL All Rights Reserved</div>
+</body>
+</html>
