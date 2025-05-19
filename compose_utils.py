@@ -1,6 +1,7 @@
 import subprocess
 import os
 
+from port_utils import port_analizer
 def init_compose(institution_name: str):
     """
     Initializes directories and configuration for a new institution.
@@ -16,6 +17,10 @@ def init_compose(institution_name: str):
     # Count the number of directories inside /MedicareSoft/
     medicaresoft_subdirs = [name for name in os.listdir(medicaresoft_dir) if os.path.isdir(os.path.join(medicaresoft_dir, name))]
     pacs_count = f"Pacs{len(medicaresoft_subdirs) + 1}"
+
+    # Analyze and get free ports
+    free_ports = port_analizer()
+
     # Create required directories
     # Create the specific MedicareSoft directory for the new institution
     medicaresoft_institution_dir = os.path.join(medicaresoft_dir, pacs_count)
@@ -28,7 +33,12 @@ def init_compose(institution_name: str):
     env_target_path = os.path.join(medicaresoft_institution_dir, ".env")
     with open(env_template_path, 'r') as f:
         env_content = f.read()
-    env_content = env_content.replace("{{pacs_name}}", pacs_count)
+    env_content = env_content.replace("{{pacs_name}}", pacs_count) # Keep this line if you still want pacs_count in the .env file
+    env_content = env_content.replace("{{DICOM_PORT}}", str(free_ports['DICOM_PORT']))
+    env_content = env_content.replace("{{MYSQL_PORT}}", str(free_ports['MYSQL_PORT']))
+    env_content = env_content.replace("{{HTTP_PORT}}", str(free_ports['HTTP_PORT']))
+    env_content = env_content.replace("{{MONGO_PORT}}", str(free_ports['MONGO_PORT']))
+    env_content = env_content.replace("{{APP_PORT}}", str(free_ports['APP_PORT']))
     os.makedirs(f"/Symphony/{pacs_count}/DCM", exist_ok=True)
     os.makedirs(f"/Symphony/{pacs_count}/INF", exist_ok=True)
     os.makedirs(f"/Symphony/{pacs_count}/MYSQL", exist_ok=True)
