@@ -16,7 +16,7 @@ def create():
         data = request.get_json()
         institution_name = data.get('institutionName')
         init_compose(institution_name)
-        return f"Institution {institution_name} initialized with compose file {compose_file_path}"
+        return f"Institution {institution_name} initialized with compose file"
     except Exception as e:
         return str(traceback.format_exc()), 500
 @app.route("/restart", methods=['POST'])
