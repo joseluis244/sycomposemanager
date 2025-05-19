@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys, traceback, json
+from compose_utils import init_compose
 from flask import Flask, send_file, request
 
 app = Flask(__name__)
@@ -9,6 +10,15 @@ app = Flask(__name__)
 def index():
     return send_file('src/index.html')
 
+@app.route("/create", methods=['POST'])
+def create():
+    try:
+        data = request.get_json()
+        institution_name = data.get('institutionName')
+        init_compose(institution_name)
+        return f"Institution {institution_name} initialized with compose file {compose_file_path}"
+    except Exception as e:
+        return str(traceback.format_exc()), 500
 @app.route("/restart", methods=['POST'])
 def restart():
     try:
@@ -70,7 +80,7 @@ def stop_compose(compose_file_path):
     subprocess.run(["docker", "compose", "-f", compose_file_path, "stop"], check=True)
 
 def main():
-  app.run(host="0.0.0.0", port=int(os.environ.get('PORT', 80)))
+  app.run(host="0.0.0.0", port=int(os.environ.get('PORT', 8080)))
 
 if __name__ == "__main__":
     main()

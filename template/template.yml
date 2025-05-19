@@ -1,0 +1,105 @@
+networks:
+  SymphonyNet:
+
+volumes:
+  DCM:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Symphony/${HOSPITAL_NAME}/DCM
+  INFORMS:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Symphony/${HOSPITAL_NAME}/INF
+  MYSQL:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Symphony/${HOSPITAL_NAME}/MYSQL
+  MONGO:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Symphony/${HOSPITAL_NAME}/MONGO
+  
+services:
+
+  mysql:
+    image: jose244/symphonypacsmysql:1.0.1
+    restart: always
+    ports:
+      - 127.0.0.1:${MYSQL_PORT}:3306
+    container_name: ${HOSPITAL_NAME}_SYMPHONYMYSQL
+    networks:
+      SymphonyNet:
+        aliases:
+          - symphonymysql
+    volumes:
+      - MYSQL:/var/lib/mysql
+
+  mongo:
+    image: jose244/symphonypacsmongo:1.0.1
+    restart: always
+    ports:
+      - 127.0.0.1:${MONGO_PORT}:27017
+    container_name: ${HOSPITAL_NAME}_SYMPHONYMONGO
+    networks:
+      SymphonyNet:
+        aliases:
+          - symphonymongo
+    volumes:
+      - MONGO:/data/db
+
+  engine:
+    image: jose244/symphonypacsengine:1.0.2
+    restart: always
+    ports:
+      - ${DICOM_PORT}:3101
+      - ${HTTP_PORT}:8042
+    container_name: ${HOSPITAL_NAME}_SYMPHONYENGINE
+    networks:
+      SymphonyNet:
+        aliases:
+          - symphonyengine
+    volumes:
+      - DCM:/var/lib/orthanc/db-v6
+    depends_on:
+      - mysql
+      - mongo
+
+  ms2mo:
+    image: jose244/symphonypacsms2mo:1.0.1
+    restart: always
+    container_name: ${HOSPITAL_NAME}_SYMPHONYMS2MO
+    networks:
+      SymphonyNet:
+        aliases:
+          - symphonyms2mo
+    depends_on:
+      - engine
+      - mongo
+      - mysql
+
+  app:
+    image: jose244/symphonypacsapp:1.0.1
+    restart: always
+    ports:
+      - ${APP_PORT}:4000
+    container_name: ${HOSPITAL_NAME}_SYMPHONYAPP
+    networks:
+      SymphonyNet:
+        aliases:
+          - symphonyapp
+    volumes:
+      - DCM:/Symphony/Files
+      - /MedicareSoft/${HOSPITAL_NAME}/App/:/MedicareSoft
+    depends_on:
+      - engine
+      - mongo
+      - mysql
+    command: "sh start.sh"
