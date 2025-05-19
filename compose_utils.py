@@ -61,6 +61,48 @@ def init_compose(institution_name: str):
     with open(compose_target_path, "w") as f:
         f.write(compose_content)
     print(f"compose.yml file created for institution: {pacs_count}")
+    return compose_target_path
+
+def restart_compose(compose_file_path):
+    """Restarts a docker-compose file.
+
+    Args:
+        compose_file_path: The path to the docker-compose file.
+    """
+    if not os.path.exists(compose_file_path):
+      raise FileNotFoundError(f"Docker-compose file not found: {compose_file_path}")
+    subprocess.run(["docker", "compose", "-f", compose_file_path, "restart"], check=True)
+
+def start_compose(compose_file_path):
+    """Starts the services defined in a docker-compose file.
+
+    Args:
+        compose_file_path: The path to the docker-compose file.
+    """
+    if not os.path.exists(compose_file_path):
+        raise FileNotFoundError(f"Docker-compose file not found: {compose_file_path}")
+    subprocess.run(["docker", "compose", "-f", compose_file_path, "start"], check=True)
+
+def stop_compose(compose_file_path):
+    """Stops a docker-compose file.
+
+    Args:
+        compose_file_path: The path to the docker-compose file.
+    """
+    if not os.path.exists(compose_file_path):
+        raise FileNotFoundError(f"Docker-compose file not found: {compose_file_path}")
+    subprocess.run(["docker", "compose", "-f", compose_file_path, "stop"], check=True)
+
+def up_compose(compose_file_path):
+    """up a docker-compose file.
+
+    Args:
+        compose_file_path: The path to the docker-compose file.
+    """
+    if not os.path.exists(compose_file_path):
+        raise FileNotFoundError(f"Docker-compose file not found: {compose_file_path}")
+    subprocess.run(["docker", "compose", "-f", compose_file_path, "up","-d"], check=True)
+
 
 if __name__ == '__main__':
     # Example usage:
